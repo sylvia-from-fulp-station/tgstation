@@ -5,7 +5,7 @@
 /// Helmet which can turn you into a BEAST!! once an anomaly core is inserted
 /obj/item/clothing/head/helmet/perceptomatrix
 	name = "perceptomatrix helm"
-	desc = "This piece of headgear harnesses the energies of a hallucinative anomaly to create a safe audiovisual replica of -all- external stimuli directly into the cerebral cortex, \
+	desc = "This piece of headgear harnesses the energies of a hallucinatory anomaly to create a safe audiovisual replica of -all- external stimuli directly into the cerebral cortex, \
 		granting the user effective immunity to both psychic threats, and anything that would affect their perception - be it ear, eye, or even brain damage. \
 		It can also violently discharge said energy, inducing hallucinations in others."
 	icon_state = "perceptomatrix_helmet_inactive"
@@ -66,6 +66,8 @@
 
 	update_appearance(UPDATE_ICON_STATE)
 	update_anomaly_state()
+	AddComponent(/datum/component/adjust_fishing_difficulty, -7) // PSYCHIC FISHING
+	AddComponent(/datum/component/hat_stabilizer, loose_hat = TRUE)
 
 /obj/item/clothing/head/helmet/perceptomatrix/equipped(mob/living/user, slot)
 	. = ..()

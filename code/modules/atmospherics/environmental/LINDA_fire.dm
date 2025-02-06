@@ -79,7 +79,7 @@
 
 		set_active_hotspot(new /obj/effect/hotspot(src, exposed_volume * 25, exposed_temperature))
 		if(COOLDOWN_FINISHED(src, fire_puff_cooldown))
-			playsound(src, 'sound/effects/fire_puff.ogg', 50)
+			playsound(src, 'sound/effects/fire_puff.ogg', 30)
 			COOLDOWN_START(src, fire_puff_cooldown, 5 SECONDS)
 
 		active_hotspot.just_spawned = (current_cycle < SSair.times_fired)
@@ -94,7 +94,7 @@
 	anchored = TRUE
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
 	icon = 'icons/effects/fire.dmi'
-	icon_state = "1"
+	icon_state = "light"
 	layer = GASFIRE_LAYER
 	plane = ABOVE_GAME_PLANE
 	blend_mode = BLEND_ADD
@@ -132,6 +132,8 @@
 	if(!isnull(starting_temperature))
 		temperature = starting_temperature
 	perform_exposure()
+	if(QDELETED(src)) // It is actually possible for this hotspot to become qdeleted in perform_exposure() if another hotspot gets created (for example in fire_act() of fuel pools)
+		return // In this case, we want to just leave and let the new hotspot take over.
 	setDir(pick(GLOB.cardinals))
 	air_update_turf(FALSE, FALSE)
 	var/static/list/loc_connections = list(
@@ -347,9 +349,10 @@
 /obj/effect/hotspot/Destroy()
 	SSair.hotspots -= src
 	var/turf/open/T = loc
-	if(istype(T) && T.active_hotspot == src)
+	if(our_hot_group)
 		our_hot_group.remove_from_group(src)
 		our_hot_group = null
+	if(istype(T) && T.active_hotspot == src)
 		T.set_active_hotspot(null)
 	return ..()
 
@@ -365,7 +368,7 @@
 /datum/looping_sound/fire
 	mid_sounds = list('sound/effects/fireclip1.ogg' = 1, 'sound/effects/fireclip2.ogg' = 1, 'sound/effects/fireclip3.ogg' = 1, 'sound/effects/fireclip4.ogg' = 1,
 	'sound/effects/fireclip5.ogg' = 1, 'sound/effects/fireclip6.ogg' = 1, 'sound/effects/fireclip7.ogg' = 1)
-	volume = 50
+	volume = 30
 	mid_length = 2 SECONDS
 	falloff_distance = 1
 
@@ -398,13 +401,16 @@
 /datum/hot_group/proc/remove_from_group(obj/effect/hotspot/target)
 	spot_list -= target
 	var/turf/open/target_turf = target.loc
-	x_coord -= target_turf.x
-	y_coord -= target_turf.y
+	if(target_turf)
+		x_coord -= target_turf.x
+		y_coord -= target_turf.y
 	if(!length(spot_list))
 		qdel(src)
 		return
 
 /datum/hot_group/proc/add_to_group(obj/effect/hotspot/target)
+	if(QDELETED(target))
+		return
 	spot_list += target
 	target.our_hot_group = src
 	var/turf/open/target_turf = target.loc

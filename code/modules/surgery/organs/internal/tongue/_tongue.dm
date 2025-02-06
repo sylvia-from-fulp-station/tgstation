@@ -124,7 +124,7 @@
 		food_taste_reaction = FOOD_LIKED
 	return food_taste_reaction
 
-/obj/item/organ/tongue/mob_insert(mob/living/carbon/receiver, special, movement_flags)
+/obj/item/organ/tongue/on_mob_insert(mob/living/carbon/receiver, special, movement_flags)
 	. = ..()
 
 	if(modifies_speech)
@@ -138,7 +138,7 @@
 	REMOVE_TRAIT(receiver, TRAIT_AGEUSIA, NO_TONGUE_TRAIT)
 	apply_tongue_effects()
 
-/obj/item/organ/tongue/mob_remove(mob/living/carbon/organ_owner, special, movement_flags)
+/obj/item/organ/tongue/on_mob_remove(mob/living/carbon/organ_owner, special, movement_flags)
 	. = ..()
 
 	temp_say_mod = ""
@@ -197,7 +197,7 @@
 		new /regex(@"\bX([\-|r|R]|\b)", "g") = "ECKS$1",
 	)
 
-/obj/item/organ/tongue/lizard/New(class, timer, datum/mutation/human/copymut)
+/obj/item/organ/tongue/lizard/Initialize(mapload)
 	. = ..()
 	AddComponent(/datum/component/speechmod, replacements = speech_replacements, should_modify_speech = CALLBACK(src, PROC_REF(should_modify_speech)))
 
@@ -557,7 +557,7 @@ GLOBAL_LIST_INIT(english_to_zombie, list())
 
 /obj/item/organ/tongue/snail
 	name = "radula"
-	desc = "A minutely toothed, chitious ribbon, which as a side effect, makes all snails talk IINNCCRREEDDIIBBLLYY SSLLOOWWLLYY."
+	desc = "A minutely toothed, chitinous ribbon, which as a side effect, makes all snails talk IINNCCRREEDDIIBBLLYY SSLLOOWWLLYY."
 	color = "#96DB00" // TODO proper sprite, rather than recoloured pink tongue
 	modifies_speech = TRUE
 	voice_filter = "atempo=0.5" // makes them talk really slow
